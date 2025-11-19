@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Encrypt/Decrypt Tool | ToolsHub</title>
+    <style>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 15px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        p.subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Main Card */
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 12px 12px 0 0;
+            font-weight: 600;
+        }
+        .tab.active {
+            background: #ff6b6b;
+            color: white;
+        }
+        .tab:hover:not(.active) {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Input Mode Toggle */
+        .input-mode {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .mode-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .mode-btn.active {
+            background: #4ecdc4;
+            border-color: #fff;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        textarea, input[type="password"], select {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+            resize: vertical;
+            min-height: 120px;
+        }
+        textarea::placeholder, input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        textarea:focus, input:focus, select:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed rgba(255,255,255,0.4);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.1);
+        }
+        .file-upload:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #fff;
+        }
+        .file-upload input {
+            display: none;
+        }
+        .file-upload-label {
+            display: block;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+        .file-name {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            word-break: break-all;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+        .btn-primary {
+            background: #ff6b6b;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #4ecdc4;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #45b7aa;
+            transform: translateY(-2px);
+        }
+        .btn-download {
+            background: #51cf66;
+            color: white;
+        }
+        .btn-download:hover {
+            background: #40b357;
+        }
+
+        /* Result */
+        .result-box {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 100px;
+            display: none;
+        }
+        .result-box.show {
+            display: block;
+        }
+        .result-box pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin: 0;
+            font-family: inherit;
+            font-size: 1.1rem;
+        }
+
+        /* Ad Spaces */
+        .ad-banner {
+            background: #333;
+            color: #aaa;
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        .ad-banner.top { margin-top: 0; }
+        .ad-banner.bottom { margin-bottom: 0; }
+        .ad-300x250 {
+            width: 300px;
+            height: 250px;
+            margin: 20px auto;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            color: #888;
+            font-size: 1rem;
+        }
+        @media (max-width: 640px) {
+            .ad-300x250 { width: 100%; height: 250px; }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .btn-group { flex-direction: column; }
+            button { min-width: auto; }
+            .input-mode { justify-content: center; }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            .card { padding: 18px; }
+            textarea { min-height: 100px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Header -->
+        <header>
+            <h1>Text Encrypt/Decrypt Tool</h1>
+            <p class="subtitle">Upload TXT file or type manually • AES-256 • Export as PDF, DOC, TXT</p>
+        </header>
+
+        <!--add 1-->
+        <div class="ad-banner top">
+            <div style="max-width:728px; margin:0 auto; height:90px; display:flex; align-items:center; justify-content:center; background:#222; border-radius:8px; color:#888;">
+                    <script type="text/javascript">
+	                    atOptions = {
+		                    'key' : '0e5634ebbc8948147db5448bd5a4e9f5',
+		                    'format' : 'iframe',
+		                    'height' : 90,
+		                    'width' : 728,
+		                    'params' : {}
+	                    };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/0e5634ebbc8948147db5448bd5a4e9f5/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" data-tab="encrypt">Encrypt</div>
+                <div class="tab" data-tab="decrypt">Decrypt</div>
+            </div>
+
+            <!-- Shared Input Area -->
+            <div class="input-mode">
+                <div class="mode-btn active" data-mode="manual">Type Manually</div>
+                <div class="mode-btn" data-mode="upload">Upload TXT File</div>
+            </div>
+
+            <!-- Encrypt Tab -->
+            <div id="encrypt" class="tab-content">
+                <div id="encrypt-manual" class="input-container">
+                    <div class="form-group">
+                        <label for="plainText">Enter Plain Text</label>
+                        <textarea id="plainText" placeholder="Type or paste your message here..."></textarea>
+                    </div>
+                </div>
+                <div id="encrypt-upload" class="input-container" style="display:none;">
+                    <div class="form-group">
+                        <label>Upload TXT File</label>
+                        <div class="file-upload" id="encryptFileUpload">
+                            <input type="file" id="encryptFileInput" accept=".txt" />
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <div class="file-upload-label">Click to upload TXT file</div>
+                            <div class="file-name" id="encryptFileName"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="encryptKey">Encryption Key (Password)</label>
+                    <input type="password" id="encryptKey" placeholder="Enter strong password" />
+                </div>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="encryptText()">Encrypt Text</button>
+                </div>
+            </div>
+
+            <!-- Decrypt Tab -->
+            <div id="decrypt" class="tab-content" style="display:none;">
+                <div id="decrypt-manual" class="input-container">
+                    <div class="form-group">
+                        <label for="cipherText">Enter Encrypted Text</label>
+                        <textarea id="cipherText" placeholder="Paste encrypted text here..."></textarea>
+                    </div>
+                </div>
+                <div id="decrypt-upload" class="input-container" style="display:none;">
+                    <div class="form-group">
+                        <label>Upload Encrypted TXT File</label>
+                        <div class="file-upload" id="decryptFileUpload">
+                            <input type="file" id="decryptFileInput" accept=".txt" />
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <div class="file-upload-label">Click to upload encrypted TXT file</div>
+                            <div class="file-name" id="decryptFileName"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="decryptKey">Decryption Key (Password)</label>
+                    <input type="password" id="decryptKey" placeholder="Enter the same password" />
+                </div>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="decryptText()">Decrypt Text</button>
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-box" id="resultBox">
+                <pre id="resultText"></pre>
+                <div class="btn-group" id="downloadButtons" style="display:none; margin-top:15px;">
+                    <button class="btn-secondary" onclick="downloadFile('txt')">Download TXT</button>
+                    <button class="btn-secondary" onclick="downloadFile('doc')">Download DOC</button>
+                    <button class="btn-download" onclick="downloadFile('pdf')">Download PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad -->
+        <div class="ad-300x250">
+            <script type="text/javascript">
+	            atOptions = {
+		            'key' : '6c87cd353f4ea9656b9d9358cf1da8b5',
+		            'format' : 'iframe',
+		            'height' : 250,
+		            'width' : 300,
+		            'params' : {}
+	            };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/6c87cd353f4ea9656b9d9358cf1da8b5/invoke.js"></script>
+        </div>
+
+        <!-- Ad -->
+        <div class="ad-banner bottom">
+            <div style="max-width:728px; margin:0 auto; height:90px; display:flex; align-items:center; justify-content:center; background:#222; border-radius:8px; color:#888;">
+                    <script type="text/javascript">
+	                    atOptions = {
+		                    'key' : '0e5634ebbc8948147db5448bd5a4e9f5',
+		                    'format' : 'iframe',
+		                    'height' : 90,
+		                    'width' : 728,
+		                    'params' : {}
+	                    };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/0e5634ebbc8948147db5448bd5a4e9f5/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            © 2025 ToolsHub. All rights reserved.
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Global
+        let currentResult = '';
+        let currentTab = 'encrypt';
+        let currentMode = 'manual';
+
+        // Tab Switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+                document.getElementById(tab.dataset.tab).style.display = 'block';
+                currentTab = tab.dataset.tab;
+                clearResult();
+                updateInputMode();
+            });
+        });
+
+        // Input Mode Toggle
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+                updateInputMode();
+            });
+        });
+
+        function updateInputMode() {
+            const prefix = currentTab === 'encrypt' ? 'encrypt' : 'decrypt';
+            document.getElementById(prefix + '-manual').style.display = currentMode === 'manual' ? 'block' : 'none';
+            document.getElementById(prefix + '-upload').style.display = currentMode === 'upload' ? 'block' : 'none';
+            clearResult();
+        }
+
+        // File Upload Handlers
+        ['encrypt', 'decrypt'].forEach(type => {
+            const uploadDiv = document.getElementById(type + 'FileUpload');
+            const fileInput = document.getElementById(type + 'FileInput');
+            const fileNameDiv = document.getElementById(type + 'FileName');
+
+            uploadDiv.addEventListener('click', () => fileInput.click());
+            uploadDiv.addEventListener('dragover', e => {
+                e.preventDefault();
+                uploadDiv.style.background = 'rgba(255,255,255,0.3)';
+            });
+            uploadDiv.addEventListener('dragleave', () => {
+                uploadDiv.style.background = 'rgba(255,255,255,0.1)';
+            });
+            uploadDiv.addEventListener('drop', e => {
+                e.preventDefault();
+                uploadDiv.style.background = 'rgba(255,255,255,0.1)';
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelect(type, e.dataTransfer.files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    handleFileSelect(type, fileInput.files[0]);
+                }
+            });
+
+            function handleFileSelect(tabType, file) {
+                if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
+                    alert('Please upload a .txt file only!');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const text = e.target.result;
+                    if (tabType === 'encrypt') {
+                        document.getElementById('plainText').value = text;
+                    } else {
+                        document.getElementById('cipherText').value = text;
+                    }
+                    fileNameDiv.textContent = `Selected: ${file.name}`;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Encrypt
+        function encryptText() {
+            let text = '';
+            if (currentMode === 'manual') {
+                text = document.getElementById('plainText').value.trim();
+            } else {
+                text = document.getElementById('plainText').value.trim();
+            }
+            const key = document.getElementById('encryptKey').value;
+            if (!text || !key) return alert('Please enter text and password!');
+            try {
+                const encrypted = CryptoJS.AES.encrypt(text, key).toString();
+                showResult(encrypted);
+            } catch (e) {
+                alert('Encryption failed!');
+            }
+        }
+
+        // Decrypt
+        function decryptText() {
+            let text = '';
+            if (currentMode === 'manual') {
+                text = document.getElementById('cipherText').value.trim();
+            } else {
+                text = document.getElementById('cipherText').value.trim();
+            }
+            const key = document.getElementById('decryptKey').value;
+            if (!text || !key) return alert('Please enter encrypted text and password!');
+            try {
+                const decrypted = CryptoJS.AES.decrypt(text, key).toString(CryptoJS.enc.Utf8);
+                if (!decrypted) throw new Error();
+                showResult(decrypted);
+            } catch (e) {
+                alert('Decryption failed! Wrong password or invalid text.');
+            }
+        }
+
+        // Show Result
+        function showResult(text) {
+            currentResult = text;
+            document.getElementById('resultText').textContent = text;
+            document.getElementById('resultBox').classList.add('show');
+            document.getElementById('downloadButtons').style.display = 'flex';
+        }
+
+        function clearResult() {
+            currentResult = '';
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('downloadButtons').style.display = 'none';
+            document.getElementById('encryptFileName').textContent = '';
+            document.getElementById('decryptFileName').textContent = '';
+        }
+
+        // Download File
+        function downloadFile(format) {
+            if (!currentResult) return;
+            const blob = new Blob([currentResult], { type: 'text/plain' });
+            let filename = `encrypted_text.${format}`;
+
+            if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFontSize(12);
+                const splitText = doc.splitTextToSize(currentResult, 180);
+                doc.text(splitText, 10, 10);
+                doc.save('encrypted_text.pdf');
+                return;
+            }
+
+            if (format === 'doc') {
+                const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export</title></head><body>";
+                const footer = "</body></html>";
+                const sourceHTML = header + "<pre>" + currentResult.replace(/</g, '&lt;').replace(/>/g, '&gt;') + "</pre>" + footer;
+                const blob = new Blob(['\ufeff', sourceHTML], { type: 'application/msword' });
+                filename = 'encrypted_text.doc';
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+                return;
+            }
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
