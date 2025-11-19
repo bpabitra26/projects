@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Investment Return Calculator | ToolsHub</title>
+    <style>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 15px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        p.subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Main Card */
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        /* Form Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input, select {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+        }
+        input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+        input:focus, select:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+        .btn-primary {
+            background: #ff6b6b;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+        .btn-download {
+            background: #51cf66;
+            color: white;
+        }
+        .btn-download:hover {
+            background: #40b357;
+        }
+
+        /* Results */
+        .results {
+            margin-top: 25px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            display: none;
+        }
+        .results.show {
+            display: block;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 1.1rem;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #51cf66;
+        }
+        .result-label {
+            opacity: 0.9;
+        }
+
+        /* Chart */
+        .chart-container {
+            margin-top: 25px;
+            height: 300px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            display: none;
+        }
+        .chart-container.show {
+            display: block;
+        }
+
+        /* Ad Spaces */
+        .ad-banner {
+            background: #333;
+            color: #aaa;
+            text-align: center;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+        .ad-banner.top { margin-top: 0; }
+        .ad-banner.bottom { margin-bottom: 0; }
+        .ad-300x250 {
+            width: 300px;
+            height: 250px;
+            margin: 20px auto;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            color: #888;
+            font-size: 1rem;
+        }
+        @media (max-width: 640px) {
+            .ad-300x250 { width: 100%; height: 250px; }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .btn-group { flex-direction: column; }
+            button { min-width: auto; }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            .card { padding: 18px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Header -->
+        <header>
+            <h1>Investment Return Calculator</h1>
+            <p class="subtitle">Calculate SIP, Lump Sum, CAGR • Export as PDF, PNG, JPG, DOC, TXT</p>
+        </header>
+
+        <!-- Ad: 728x90 Size -->
+        <div class="ad-banner top">
+            <div style="max-width:728px; margin:0 auto; height:90px; display:flex; align-items:center; justify-content:center; background:#222; border-radius:8px; color:#888;">
+                    <script type="text/javascript">
+	                    atOptions = {
+		                    'key' : '0e5634ebbc8948147db5448bd5a4e9f5',
+		                    'format' : 'iframe',
+		                    'height' : 90,
+		                    'width' : 728,
+		                    'params' : {}
+	                    };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/0e5634ebbc8948147db5448bd5a4e9f5/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="investmentType">Investment Type</label>
+                    <select id="investmentType">
+                        <option value="sip" style="color: black;">SIP (Monthly)</option>
+                        <option value="lumpsum" style="color: black;">Lump Sum</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="principal">Initial Investment (₹)</label>
+                    <input type="number" id="principal" placeholder="e.g. 100000" min="0" />
+                </div>
+                <div class="form-group" id="monthlyInvestGroup">
+                    <label for="monthlyInvest">Monthly Investment (₹)</label>
+                    <input type="number" id="monthlyInvest" placeholder="e.g. 5000" min="0" />
+                </div>
+                <div class="form-group">
+                    <label for="years">Time Period (Years)</label>
+                    <input type="number" id="years" placeholder="e.g. 10" min="1" max="50" />
+                </div>
+                <div class="form-group">
+                    <label for="rate">Expected Return Rate (% p.a.)</label>
+                    <input type="number" id="rate" placeholder="e.g. 12" step="0.1" min="0" max="100" />
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" onclick="calculateReturns()">Calculate Returns</button>
+                <button class="btn-primary" onclick="resetForm()">Reset</button>
+            </div>
+
+            <!-- Results -->
+            <div class="results" id="results">
+                <div class="result-item">
+                    <span class="result-label">Total Investment</span>
+                    <span id="totalInvested">₹0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Estimated Returns</span>
+                    <span id="returns">₹0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Value</span>
+                    <span id="totalValue">₹0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">CAGR</span>
+                    <span id="cagr">0%</span>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-container" id="chartContainer">
+                <canvas id="growthChart"></canvas>
+            </div>
+
+            <!-- Download Buttons -->
+            <div class="btn-group" id="downloadButtons" style="display:none; margin-top:20px;">
+                <button class="btn-download" onclick="downloadFile('txt')">TXT</button>
+                <button class="btn-download" onclick="downloadFile('doc')">DOC</button>
+                <button class="btn-download" onclick="downloadFile('pdf')">PDF</button>
+                <button class="btn-download" onclick="downloadFile('png')">PNG</button>
+                <button class="btn-download" onclick="downloadFile('jpg')">JPG</button>
+            </div>
+        </div>
+
+
+        <div class="ad-300x250">
+                <script type="text/javascript">
+	                atOptions = {
+		                'key' : '6c87cd353f4ea9656b9d9358cf1da8b5',
+		                'format' : 'iframe',
+		                'height' : 250,
+		                'width' : 300,
+		                'params' : {}
+	                };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/6c87cd353f4ea9656b9d9358cf1da8b5/invoke.js"></script>
+        </div>
+
+        <!-- Ad: 728x90 Size -->
+        <div class="ad-banner bottom">
+            <div style="max-width:728px; margin:0 auto; height:90px; display:flex; align-items:center; justify-content:center; background:#222; border-radius:8px; color:#888;">
+                    <script type="text/javascript">
+	                    atOptions = {
+		                    'key' : '0e5634ebbc8948147db5448bd5a4e9f5',
+		                    'format' : 'iframe',
+		                    'height' : 90,
+		                    'width' : 728,
+		                    'params' : {}
+	                    };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/0e5634ebbc8948147db5448bd5a4e9f5/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            © 2025 ToolsHub. All rights reserved.
+        </footer>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        let chart = null;
+        let resultData = {};
+
+        // Toggle Monthly Investment Field
+        document.getElementById('investmentType').addEventListener('change', function() {
+            const monthlyGroup = document.getElementById('monthlyInvestGroup');
+            monthlyGroup.style.display = this.value === 'sip' ? 'flex' : 'none';
+            if (this.value === 'lumpsum') {
+                document.getElementById('monthlyInvest').value = '';
+            }
+        });
+
+        // Calculate Returns
+        function calculateReturns() {
+            const type = document.getElementById('investmentType').value;
+            const principal = parseFloat(document.getElementById('principal').value) || 0;
+            const monthly = type === 'sip' ? parseFloat(document.getElementById('monthlyInvest').value) || 0 : 0;
+            const years = parseFloat(document.getElementById('years').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 0;
+
+            if (principal <= 0 || years <= 0 || rate <= 0 || (type === 'sip' && monthly <= 0)) {
+                alert('Please fill all fields with valid values!');
+                return;
+            }
+
+            let totalInvested, futureValue, returns, cagr;
+
+            if (type === 'sip') {
+                const months = years * 12;
+                const monthlyRate = rate / (12 * 100);
+                futureValue = principal * Math.pow(1 + monthlyRate, months) + 
+                              monthly * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+                totalInvested = principal + (monthly * months);
+            } else {
+                futureValue = principal * Math.pow(1 + rate/100, years);
+                totalInvested = principal;
+            }
+
+            returns = futureValue - totalInvested;
+            cagr = ((futureValue / totalInvested) ** (1/years) - 1) * 100;
+
+            // Update Results
+            document.getElementById('totalInvested').textContent = formatINR(totalInvested);
+            document.getElementById('returns').textContent = formatINR(returns);
+            document.getElementById('totalValue').textContent = formatINR(futureValue);
+            document.getElementById('cagr').textContent = cagr.toFixed(2) + '%';
+
+            document.getElementById('results').classList.add('show');
+            document.getElementById('downloadButtons').style.display = 'flex';
+
+            // Save Data
+            resultData = { type, principal, monthly, years, rate, totalInvested, returns, futureValue, cagr };
+
+            // Draw Chart
+            drawChart();
+        }
+
+        function formatINR(amount) {
+            return '₹' + amount.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+        }
+
+        function drawChart() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            const years = resultData.years;
+            const labels = Array.from({length: years + 1}, (_, i) => `Year ${i}`);
+            const data = [];
+
+            if (resultData.type === 'sip') {
+                const monthlyRate = resultData.rate / (12 * 100);
+                let balance = resultData.principal;
+                for (let year = 0; year <= years; year++) {
+                    data.push(balance);
+                    for (let m = 0; m < 12 && year < years; m++) {
+                        balance = balance * (1 + monthlyRate) + resultData.monthly;
+                    }
+                }
+            } else {
+                for (let year = 0; year <= years; year++) {
+                    data.push(resultData.principal * Math.pow(1 + resultData.rate/100, year));
+                }
+            }
+
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Investment Growth',
+                        data: data,
+                        borderColor: '#51cf66',
+                        backgroundColor: 'rgba(81, 207, 102, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#fff' } } },
+                    scales: {
+                        y: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    }
+                }
+            });
+
+            document.getElementById('chartContainer').classList.add('show');
+        }
+
+        function resetForm() {
+            document.getElementById('principal').value = '';
+            document.getElementById('monthlyInvest').value = '';
+            document.getElementById('years').value = '';
+            document.getElementById('rate').value = '';
+            document.getElementById('investmentType').value = 'sip';
+            document.getElementById('monthlyInvestGroup').style.display = 'flex';
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('chartContainer').classList.remove('show');
+            document.getElementById('downloadButtons').style.display = 'none';
+            if (chart) chart.destroy();
+        }
+
+        // Download Functions
+        async function downloadFile(format) {
+            const resultsDiv = document.getElementById('results');
+            const chartCanvas = document.getElementById('growthChart');
+
+            if (format === 'png' || format === 'jpg') {
+                const canvas = await html2canvas(document.querySelector('.card'));
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `investment_report.${format}`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }, `image/${format}`);
+                return;
+            }
+
+            if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const width = doc.internal.pageSize.getWidth();
+                let y = 20;
+
+                doc.setFontSize(16).text('Investment Return Report', width/2, y, { align: 'center' });
+                y += 15;
+
+                doc.setFontSize(12);
+                const lines = [
+                    `Type: ${resultData.type === 'sip' ? 'SIP' : 'Lump Sum'}`,
+                    `Principal: ${formatINR(resultData.principal)}`,
+                    resultData.type === 'sip' ? `Monthly: ${formatINR(resultData.monthly)}` : '',
+                    `Years: ${resultData.years}`,
+                    `Rate: ${resultData.rate}% p.a.`,
+                    '',
+                    `Total Invested: ${formatINR(resultData.totalInvested)}`,
+                    `Returns: ${formatINR(resultData.returns)}`,
+                    `Total Value: ${formatINR(resultData.futureValue)}`,
+                    `CAGR: ${resultData.cagr.toFixed(2)}%`
+                ].filter(Boolean);
+
+                lines.forEach(line => {
+                    doc.text(line, 20, y);
+                    y += 10;
+                });
+
+                // Add Chart
+                const chartImg = chartCanvas.toDataURL('image/png');
+                doc.addPage();
+                doc.addImage(chartImg, 'PNG', 10, 10, width - 20, 120);
+
+                doc.save('investment_report.pdf');
+                return;
+            }
+
+            // TXT & DOC
+            const content = `
+Investment Return Report
+========================
+Type: ${resultData.type === 'sip' ? 'SIP' : 'Lump Sum'}
+Initial Investment: ${formatINR(resultData.principal)}
+${resultData.type === 'sip' ? `Monthly Investment: ${formatINR(resultData.monthly)}` : ''}
+Time Period: ${resultData.years} years
+Expected Rate: ${resultData.rate}% p.a.
+
+Results:
+Total Invested: ${formatINR(resultData.totalInvested)}
+Estimated Returns: ${formatINR(resultData.returns)}
+Total Value: ${formatINR(resultData.futureValue)}
+CAGR: ${resultData.cagr.toFixed(2)}%
+            `.trim();
+
+            if (format === 'txt') {
+                const blob = new Blob([content], { type: 'text/plain' });
+                downloadBlob(blob, 'investment_report.txt');
+            } else if (format === 'doc') {
+                const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Report</title></head><body>";
+                const footer = "</body></html>";
+                const html = header + "<pre>" + content.replace(/</g, '&lt;').replace(/>/g, '&gt;') + "</pre>" + footer;
+                const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+                downloadBlob(blob, 'investment_report.doc');
+            }
+        }
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
